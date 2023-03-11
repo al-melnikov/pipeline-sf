@@ -22,6 +22,6 @@ func (p *Pipeline) Run(source <-chan int) <-chan int {
 }
 
 func (p *Pipeline) runStage(stage Stage, sourceChan <-chan int) <-chan int {
-	// запустть канал и вернуть его результат
+	// запустить канал и вернуть его результат
 	return stage.run(p.done, sourceChan)
 }
