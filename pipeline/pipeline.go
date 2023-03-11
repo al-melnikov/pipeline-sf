@@ -7,6 +7,7 @@ type Pipeline struct {
 	done   <-chan bool
 }
 
+// Создает новый пайплайн и возвращает указатель на него
 func New(done <-chan bool, stages ...Stage) *Pipeline {
 	return &Pipeline{stages: stages, done: done}
 }
