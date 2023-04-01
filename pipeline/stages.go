@@ -3,6 +3,7 @@
 package pipeline
 
 import (
+	"log"
 	"pipeline/ringbuffer"
 	"time"
 )
@@ -27,9 +28,12 @@ func (nf *NegativeFilter) run(done <-chan bool, source <-chan int) <-chan int {
 				if data > 0 {
 					select {
 					case res <- data:
+						log.Printf("%d passed negative filter", data)
 					case <-done:
 						return
 					}
+				} else {
+					log.Printf("%d did not pass negative filter", data)
 				}
 			case <-done:
 				return
@@ -48,9 +52,12 @@ func (sf *SpecialFilter) run(done <-chan bool, source <-chan int) <-chan int {
 				if data != 0 && data%3 == 0 {
 					select {
 					case res <- data:
+						log.Printf("%d passed special filter", data)
 					case <-done:
 						return
 					}
+				} else {
+					log.Printf("%d did not pass special filter", data)
 				}
 			case <-done:
 				return
@@ -67,6 +74,7 @@ func (bf *BufferStage) run(done <-chan bool, source <-chan int) <-chan int {
 		for {
 			select {
 			case data := <-source:
+				log.Printf("%d pushed in buffer", data)
 				buffer.Push(data)
 			case <-done:
 				return
@@ -78,6 +86,7 @@ func (bf *BufferStage) run(done <-chan bool, source <-chan int) <-chan int {
 		for {
 			select {
 			case <-time.After(time.Duration(BufferDrainInterval) * time.Second):
+				log.Printf("drain time passed, buffer is released\n")
 				bufferData := buffer.Get()
 				for _, data := range bufferData {
 					select {
